@@ -1,0 +1,49 @@
+server:
+  port: 8094
+spring:
+  application:
+    name: es-demo
+  profiles:
+    active: dev
+    include: swagger
+  jackson:
+    serialization.indent_output: true
+    #时区
+    time-zone: GMT+8
+  jpa:
+    #配置数据库类型
+    database: MYSQL
+    #配置是否打印sql
+    show-sql: true
+    #Hibernate相关配置
+    hibernate:
+      #配置级联等级
+      ddl-auto: none
+      naming:
+        #命名策略
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/local-test?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    type: com.zaxxer.hikari.HikariDataSource
+    username: root
+    password: root
+    hikari:
+      #最大连接池数
+      maximumPoolSize: 3
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+file-info:
+  upload-path: C:\\work\\projects_data\\files\\esdemo
+# PageHelper分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
