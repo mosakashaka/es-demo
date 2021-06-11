@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -100,6 +101,7 @@ public class FileInfoServiceImpl implements FileInfoService {
         }
 
         InputStream inStream = null;
+        OutputStream out = null;
         try {
             // 读到流中
             inStream = new FileInputStream(phyPath);// 文件的存放路径
@@ -109,17 +111,22 @@ public class FileInfoServiceImpl implements FileInfoService {
             response.setContentType("multipart/form-data");
             response.addHeader("Content-Disposition",
                     "attachment; filename=\"" + URLEncoder.encode(fi.getOriginalName(), "UTF-8") + "\"");
+            response.setHeader("x-decompressed-content-length", String.valueOf(file.length()));
             // 循环取出流中的数据
             byte[] b = new byte[4096];
             int len;
+            out = response.getOutputStream();
             while ((len = inStream.read(b)) > 0) {
-                response.getOutputStream().write(b, 0, len);
+                out.write(b, 0, len);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (null != inStream) {
                 inStream.close();
+            }
+            if (null != out) {
+                out.close();
             }
         }
         return fi.getOriginalName();

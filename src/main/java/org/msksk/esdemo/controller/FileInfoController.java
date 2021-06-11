@@ -35,9 +35,9 @@ public class FileInfoController {
     }
 
     @GetMapping("/downloadFile/{fileId}")
-    public Result<String> downloadFile(HttpServletRequest request, HttpServletResponse response,@PathVariable Integer fileId) throws IOException {
+    public void downloadFile(HttpServletRequest request, HttpServletResponse response,@PathVariable Integer fileId) throws IOException {
         String fn = fiService.downloadFile(request, response, fileId);
-        return R.success(fn);
+        //return R.success(fn);
     }
 
     @PostMapping("/search")
