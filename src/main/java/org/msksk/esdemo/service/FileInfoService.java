@@ -16,5 +16,7 @@ public interface FileInfoService {
 
     String downloadFile(HttpServletRequest request, HttpServletResponse response, Integer fileId) throws IOException;
 
+    int deleteFile(Integer fileId);
+
     PageInfo<FileInfo> searchFile(FileSearchDTO searchDTO);
 }

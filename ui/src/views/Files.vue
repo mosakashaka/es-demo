@@ -66,7 +66,7 @@
 </template>
 
 <script>
-    import {searchFile, downloadFile} from '@/utils/api'
+    import {searchFile, downloadFile, deleteFile} from '@/utils/api'
 
     export default {
         name: 'Files',
@@ -109,10 +109,38 @@
                     link.click()
                     link.remove()
                 }).catch((err) => {
+                    this.$notify.error({
+                        title: '错误',
+                        message: '下载失败：' + err
+                    });
                     console.log(err)
                 })
             },
             handleDelete(idx) {
+                let fileId = this.tableData[idx].id
+                let fileName = this.tableData[idx].originalName
+                deleteFile(fileId).then(response => {
+                    if (response.success) {
+                        this.$notify({
+                            title: '提示',
+                            message: '删除成功',
+                            type: 'success'
+                        });
+                        this.searchFile()
+                    } else {
+                        this.$notify({
+                            title: '警告',
+                            message: '删除失败：' + response.msg,
+                            type: 'warning'
+                        });
+                    }
+                }).catch( (err) => {
+                    this.$notify.error({
+                        title: '错误',
+                        message: '删除失败：' + err
+                    });
+                    console.log(err)
+                })
 
             },
             searchFile() {

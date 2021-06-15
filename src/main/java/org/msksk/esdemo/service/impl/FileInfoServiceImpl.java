@@ -133,6 +133,26 @@ public class FileInfoServiceImpl implements FileInfoService {
     }
 
     @Override
+    public int deleteFile(Integer fileId) {
+        FileInfo fi = fiRepo.getOne(fileId);
+        if (null == fi) {
+            throw new BusinessException("File not found");
+        }
+
+        //delete file on disk
+        String phyPath = genFilePath(uploadPath, fi.getPath(), fi.getPhyName());
+        File file = new File(phyPath);
+        file.delete();
+
+        //TODO: delete on es
+
+        //delete record
+        fiRepo.deleteById(fi.getId());
+
+        return 0;
+    }
+
+    @Override
     public PageInfo<FileInfo> searchFile(FileSearchDTO searchDTO) {
         PageHelper.startPage(searchDTO.getPageNumber(), searchDTO.getPageSize());
         List<FileInfo> files = fiRepo.search(searchDTO);

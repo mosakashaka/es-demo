@@ -7,6 +7,7 @@ import org.msksk.esdemo.dto.Result;
 import org.msksk.esdemo.service.FileInfoService;
 import org.msksk.esdemo.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,8 +37,14 @@ public class FileInfoController {
 
     @GetMapping("/downloadFile/{fileId}")
     public void downloadFile(HttpServletRequest request, HttpServletResponse response,@PathVariable Integer fileId) throws IOException {
-        String fn = fiService.downloadFile(request, response, fileId);
+        fiService.downloadFile(request, response, fileId);
         //return R.success(fn);
+    }
+
+    @DeleteMapping("/{fileId}")
+    public Result deleteFile(@PathVariable Integer fileId) {
+        int result = fiService.deleteFile(fileId);
+        return R.success(result);
     }
 
     @PostMapping("/search")

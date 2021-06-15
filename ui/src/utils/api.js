@@ -15,3 +15,10 @@ export function downloadFile(fileId) {
     responseType: 'blob'
   });
 }
+
+export function deleteFile(fileId) {
+  return request({
+    url: "/file/" + fileId,
+    method: "delete"
+  });
+}
