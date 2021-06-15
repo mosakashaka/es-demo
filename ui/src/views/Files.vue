@@ -28,11 +28,21 @@
                 </el-table-column>
                 <el-table-column
                         fixed="right"
-                        label="Operations"
+                        label="操作"
                         width="120">
                     <template slot-scope="scope">
                         <el-button @click="handleDownload(scope.$index)" type="text" size="small">下载</el-button>
-                        <el-button @click="handleDelete(scope.$index)" type="text" size="small">删除</el-button>
+                        &nbsp;
+                        <el-popconfirm
+                                confirm-button-text='确定'
+                                cancel-button-text='取消'
+                                icon="el-icon-info"
+                                icon-color="red"
+                                title="确认要删除该文件吗?"
+                                @confirm="handleDelete(scope.$index)"
+                        >
+                            <el-button slot="reference" type="text" size="small">删除</el-button>
+                        </el-popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
