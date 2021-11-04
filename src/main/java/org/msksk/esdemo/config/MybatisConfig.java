@@ -1,18 +1,32 @@
 package org.msksk.esdemo.config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-//下面此行用来排序的注解接口,用于处理加载优先级的问题,拥有两个枚举变量
-@Order(Ordered.HIGHEST_PRECEDENCE)
 //下面此行代表此类为配置类
 @Configuration
 //下面此行代表此类开启事务管理
 @EnableTransactionManagement(proxyTargetClass = true)
-//也可以定义为类 如DeptRepository.class   也可以定义过滤器 includeFilters={ @ComponentScan.Filter(type=FilterType.ANNOTATION,value=Service.class)}
-@EnableJpaRepositories(basePackages="org.msksk.esdemo.repository")
+@MapperScan({"org.msksk.esdemo.mapper"})
 public class MybatisConfig {
+    /**
+     * 新的分页插件,一缓和二缓遵循mybatis的规则,需要设置 MybatisConfiguration#useDeprecatedExecutor = false 避免缓存出现问题(该属性会在旧插件移除后一同移除)
+     */
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        return interceptor;
+    }
+
+    @Bean
+    public ConfigurationCustomizer configurationCustomizer() {
+        return configuration -> configuration.setUseDeprecatedExecutor(false);
+    }
 }

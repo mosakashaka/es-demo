@@ -1,10 +1,18 @@
 <template>
     <div id="files">
         <el-header>
-            <el-button type="success" @click="modalVisible = true">
-                上传
-            </el-button>
-            <el-button type="primary" icon="el-icon-search" @click="searchFile">搜索</el-button>
+            <div>
+                <el-button type="success" @click="modalVisible = true">
+                    上传
+                </el-button>
+                <el-input
+                        placeholder="输入搜索内容"
+                        v-model="search.fileName"
+                        style="width:180px;padding-left: 10px;padding-right: 10px"
+                        clearable>
+                </el-input>
+                <el-button type="primary" icon="el-icon-search" @click="searchFile">搜索</el-button>
+            </div>
         </el-header>
         <el-main>
             <el-table
@@ -101,6 +109,7 @@
         methods: {
             handleClose() {
                 this.modalVisible = false
+                this.fileList = []
                 this.searchFile()
             },
             handleUploadSuccess() {
@@ -128,7 +137,7 @@
             },
             handleDelete(idx) {
                 let fileId = this.tableData[idx].id
-                let fileName = this.tableData[idx].originalName
+                //let fileName = this.tableData[idx].originalName
                 deleteFile(fileId).then(response => {
                     if (response.success) {
                         this.$notify({
@@ -155,7 +164,7 @@
             },
             searchFile() {
                 searchFile(this.search).then(response => {
-                    this.tableData = response.data.list
+                    this.tableData = response.data.records
                     this.total = response.data.total
                 })
             }

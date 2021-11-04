@@ -1,12 +1,15 @@
 package org.msksk.esdemo.service.impl;
 
-import com.github.pagehelper.PageHelper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.msksk.esdemo.config.BusinessException;
 import org.msksk.esdemo.domain.FileInfo;
 import org.msksk.esdemo.dto.FileSearchDTO;
-import org.msksk.esdemo.repository.FileInfoRepository;
+import org.msksk.esdemo.mapper.FileInfoMapper;
 import org.msksk.esdemo.service.FileInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +37,7 @@ import java.util.UUID;
 public class FileInfoServiceImpl implements FileInfoService {
 
     @Autowired
-    FileInfoRepository fiRepo;
+    FileInfoMapper mapper;
 
     @Value("${file-info.upload-path}")
     String uploadPath;
@@ -81,16 +84,16 @@ public class FileInfoServiceImpl implements FileInfoService {
         fi.setOriginalName(originalName);
         fi.setPath(folder);
         fi.setType(ext);
-        fi.setCreateTime(now);
-        fi.setUpdateTime(now);
-        FileInfo saved = fiRepo.save(fi);
+        //fi.setCreateTime(now);
+        //fi.setUpdateTime(now);
+        mapper.insert(fi);
 
-        return saved;
+        return fi;
     }
 
     @Override
     public String downloadFile(HttpServletRequest request, HttpServletResponse response, Integer fileId) throws IOException {
-        FileInfo fi = fiRepo.getOne(fileId);
+        FileInfo fi = mapper.selectById(fileId);
         if (null == fi) {
             throw new BusinessException("File not found");
         }
@@ -134,7 +137,7 @@ public class FileInfoServiceImpl implements FileInfoService {
 
     @Override
     public int deleteFile(Integer fileId) {
-        FileInfo fi = fiRepo.getOne(fileId);
+        FileInfo fi = mapper.selectById(fileId);
         if (null == fi) {
             throw new BusinessException("File not found");
         }
@@ -147,16 +150,23 @@ public class FileInfoServiceImpl implements FileInfoService {
         //TODO: delete on es
 
         //delete record
-        fiRepo.deleteById(fi.getId());
+        mapper.deleteById(fi.getId());
 
         return 0;
     }
 
     @Override
-    public PageInfo<FileInfo> searchFile(FileSearchDTO searchDTO) {
-        PageHelper.startPage(searchDTO.getPageNumber(), searchDTO.getPageSize());
-        List<FileInfo> files = fiRepo.search(searchDTO);
-        return new PageInfo<>(files);
+    public IPage<FileInfo> searchFile(FileSearchDTO searchDTO) {
+        Wrapper qw = new QueryWrapper<FileInfo>().lambda()
+                .like(FileInfo::getOriginalName, searchDTO.getFileName())
+                .orderBy(true, true, FileInfo::getId);
+
+        IPage<FileInfo> files = mapper.selectPage(
+                new Page<>(searchDTO.getPageNumber(), searchDTO.getPageSize()),
+                qw
+        );
+
+        return files;
     }
 
     private String genFilePath(String... names) {

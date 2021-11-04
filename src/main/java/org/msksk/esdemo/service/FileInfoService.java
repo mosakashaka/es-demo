@@ -1,5 +1,6 @@
 package org.msksk.esdemo.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.pagehelper.PageInfo;
 import org.msksk.esdemo.domain.FileInfo;
 import org.msksk.esdemo.dto.FileSearchDTO;
@@ -18,5 +19,5 @@ public interface FileInfoService {
 
     int deleteFile(Integer fileId);
 
-    PageInfo<FileInfo> searchFile(FileSearchDTO searchDTO);
+    IPage<FileInfo> searchFile(FileSearchDTO searchDTO);
 }

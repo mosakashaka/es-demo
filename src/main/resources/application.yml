@@ -10,21 +10,6 @@ spring:
     serialization.indent_output: true
     #时区
     time-zone: GMT+8
-  jpa:
-    #配置数据库类型
-    database: MYSQL
-    #配置是否打印sql
-    show-sql: true
-    #Hibernate相关配置
-    hibernate:
-      #配置级联等级
-      ddl-auto: none
-      naming:
-        #命名策略
-        strategy: org.hibernate.cfg.ImprovedNamingStrategy
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/local-test?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
@@ -46,9 +31,13 @@ spring:
         useServerPrepStmts: true
 file-info:
   upload-path: C:\\work\\projects_data\\files\\esdemo
-# PageHelper分页插件
-pagehelper:
-  helperDialect: mysql
-  reasonable: true
-  supportMethodsArguments: true
-  params: count=countSql
+mybatis-plus:
+  #type-aliases-package: com
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 1000
+    default-statement-timeout: 120
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+  mapper-locations: classpath:mapper/**/*.xml
+  type-handlers-package: com.ctsi.ssdc.riskassesssync.dao.util
+  executor-type: simple

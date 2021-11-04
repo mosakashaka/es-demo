@@ -1,5 +1,6 @@
 package org.msksk.esdemo.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.pagehelper.PageInfo;
 import org.msksk.esdemo.domain.FileInfo;
 import org.msksk.esdemo.dto.FileSearchDTO;
@@ -48,8 +49,8 @@ public class FileInfoController {
     }
 
     @PostMapping("/search")
-    public Result<PageInfo<FileInfo>> searchFile(@RequestBody FileSearchDTO searchDTO) {
-        PageInfo<FileInfo> fis = fiService.searchFile(searchDTO);
+    public Result<IPage<FileInfo>> searchFile(@RequestBody FileSearchDTO searchDTO) {
+        IPage<FileInfo> fis = fiService.searchFile(searchDTO);
         return R.success(fis);
     }
 }
