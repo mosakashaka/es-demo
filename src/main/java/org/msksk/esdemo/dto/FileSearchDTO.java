@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class FileSearchDTO {
-    private String fileName;
+    private String keyword;
 
     private Integer pageSize;
 

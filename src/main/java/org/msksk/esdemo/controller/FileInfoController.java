@@ -1,7 +1,6 @@
 package org.msksk.esdemo.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.pagehelper.PageInfo;
 import org.msksk.esdemo.domain.FileInfo;
 import org.msksk.esdemo.dto.FileSearchDTO;
 import org.msksk.esdemo.dto.Result;
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/file")

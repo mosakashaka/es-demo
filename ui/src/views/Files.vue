@@ -7,7 +7,7 @@
                 </el-button>
                 <el-input
                         placeholder="输入搜索内容"
-                        v-model="search.fileName"
+                        v-model="search.keyword"
                         style="width:180px;padding-left: 10px;padding-right: 10px"
                         clearable>
                 </el-input>
@@ -92,16 +92,14 @@
         data() {
             return {
                 search: {
-                    fileName: '',
+                    keyword: '',
                     pageSize: 10,
                     pageNumber: 1
                 },
                 fileList: [],
                 modalVisible: false,
                 tableOptions: {},
-                tableData: [{
-
-                }],
+                tableData: [],
                 total: 0,
                 uploadUrl : process.env.VUE_APP_BASE_API + '/file/upload'
             }

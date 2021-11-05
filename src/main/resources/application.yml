@@ -29,6 +29,9 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
 file-info:
   upload-path: C:\\work\\projects_data\\files\\esdemo
 mybatis-plus:

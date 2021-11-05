@@ -4,16 +4,21 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.msksk.esdemo.config.BusinessException;
+import org.msksk.esdemo.domain.EsFile;
 import org.msksk.esdemo.domain.FileInfo;
 import org.msksk.esdemo.dto.FileSearchDTO;
 import org.msksk.esdemo.mapper.FileInfoMapper;
+import org.msksk.esdemo.repository.EsFileRepository;
 import org.msksk.esdemo.service.FileInfoService;
+import org.msksk.esdemo.utils.FileContentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -38,6 +44,9 @@ public class FileInfoServiceImpl implements FileInfoService {
 
     @Autowired
     FileInfoMapper mapper;
+
+    @Autowired
+    EsFileRepository esRepo;
 
     @Value("${file-info.upload-path}")
     String uploadPath;
@@ -87,6 +96,14 @@ public class FileInfoServiceImpl implements FileInfoService {
         //fi.setCreateTime(now);
         //fi.setUpdateTime(now);
         mapper.insert(fi);
+
+        //save to es
+        EsFile ef = new EsFile();
+        ef.setId(fi.getId());
+        ef.setContent(FileContentConverter.readContent(file.getInputStream(), ext));
+        ef.setName(fi.getOriginalName());
+        ef.setUpdateTime(fi.getCreateTime());
+        esRepo.save(ef);
 
         return fi;
     }
@@ -147,7 +164,8 @@ public class FileInfoServiceImpl implements FileInfoService {
         File file = new File(phyPath);
         file.delete();
 
-        //TODO: delete on es
+        //delete on es
+        esRepo.deleteById(fileId);
 
         //delete record
         mapper.deleteById(fi.getId());
@@ -157,8 +175,21 @@ public class FileInfoServiceImpl implements FileInfoService {
 
     @Override
     public IPage<FileInfo> searchFile(FileSearchDTO searchDTO) {
+        if (StringUtils.isEmpty(searchDTO.getKeyword())) {
+            return mapper.selectPage(new Page<>(searchDTO.getPageNumber(), searchDTO.getPageSize()),
+                    new QueryWrapper<>());
+        }
+        org.springframework.data.domain.Page<EsFile> matched = esRepo.findByNameOrContent(
+                PageRequest.of(searchDTO.getPageNumber() - 1, searchDTO.getPageSize()),
+                searchDTO.getKeyword(), searchDTO.getKeyword());
+        if (!matched.hasContent()) {
+            return null;
+        }
+
         Wrapper qw = new QueryWrapper<FileInfo>().lambda()
-                .like(FileInfo::getOriginalName, searchDTO.getFileName())
+                .in(FileInfo::getId, matched.getContent()
+                        .stream().map(p -> p.getId()).collect(Collectors.toList())
+                )
                 .orderBy(true, true, FileInfo::getId);
 
         IPage<FileInfo> files = mapper.selectPage(
